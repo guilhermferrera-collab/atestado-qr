@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Painel Admin</title>
+<link rel="stylesheet" href="/style.css">
+</head>
+
+<body>
+
+<div class="container">
+
+  <div class="topo">
+
+    <img src="/lab.jpg" class="logo">
+
+    <h1>Painel de Atestados</h1>
+
+    <p class="texto">
+      Cadastro inicial de atestado médico.
+    </p>
+
+    <p>
+      <a href="/lista">
+        📋 Ver lista de atestados
+      </a>
+    </p>
+
+  </div>
+
+  <div class="card dados">
+
+    <h2>Novo Atestado</h2>
+
+    <form action="/criar" method="GET">
+
+      <p>Nome do Paciente</p>
+      <input name="nome" type="text" required>
+
+      <p>CPF</p>
+      <input name="cpf" type="text" required>
+
+      <p>Data de Nascimento</p>
+      <input name="nascimento" type="text" required>
+
+      <p>Médico</p>
+      <input name="medico" type="text" required>
+
+      <p>CRM</p>
+      <input name="crm" type="text" required>
+
+      <p>Afastamento</p>
+      <input name="afastamento" type="text" required>
+
+      <br><br>
+
+      <button type="submit">
+        Gerar Atestado
+      </button>
+
+    </form>
+
+  </div>
+
+</div>
+
+</body>
+</html>
