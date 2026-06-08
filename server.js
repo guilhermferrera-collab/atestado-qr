@@ -120,7 +120,7 @@ const server = http.createServer((req, res) => {
   }
 
   if (req.url.startsWith("/criar")) {
-    const url = new URL(req.url, "http://localhost:3000");
+    const url = new URL(req.url, "https://atestado-qr.onrender.com");
 
     const atestados = carregarAtestados();
     const token = gerarToken(atestados);
@@ -162,11 +162,11 @@ const server = http.createServer((req, res) => {
 
           <div class="card dados">
             <h2>Link de validação</h2>
-            <p>http://localhost:3000/validar?token=${token}</p>
+            <p>https://atestado-qr.onrender.com/validar?token=${token}</p>
 
             <h2>QR Code</h2>
             <img 
-              src="https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=http://localhost:3000/validar?token=${token}" 
+              src="https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=https://atestado-qr.onrender.com/validar?token=${token}" 
               width="220"
             >
           </div>
@@ -236,7 +236,7 @@ const server = http.createServer((req, res) => {
   }
 
   if (req.url.startsWith("/excluir")) {
-    const url = new URL(req.url, "http://localhost:3000");
+    const url = new URL(req.url, "https://atestado-qr.onrender.com");
     const token = url.searchParams.get("token");
 
     let atestados = carregarAtestados();
@@ -257,7 +257,7 @@ const server = http.createServer((req, res) => {
   }
 
   if (req.url.startsWith("/validar")) {
-    const url = new URL(req.url, "http://localhost:3000");
+    const url = new URL(req.url, "https://atestado-qr.onrender.com");
     const token = url.searchParams.get("token");
 
     const atestados = carregarAtestados();
