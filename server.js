@@ -26,10 +26,8 @@ function salvarAtestados(atestados) {
     JSON.stringify(atestados, null, 2)
   );
 }
-
-function gerarToken(atestados) {
-  const numero = atestados.length + 1;
-  return "ATT-" + String(numero).padStart(3, "0");
+function gerarToken() {
+  return Math.random().toString(36).substring(2, 14).toUpperCase();
 }
 
 function gerarCodigo() {
@@ -123,7 +121,7 @@ const server = http.createServer((req, res) => {
     const url = new URL(req.url, "https://atestado-qr.onrender.com");
 
     const atestados = carregarAtestados();
-    const token = gerarToken(atestados);
+    const token = gerarToken();
 
     const novoAtestado = {
       token,
