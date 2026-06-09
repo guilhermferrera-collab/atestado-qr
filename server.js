@@ -27,7 +27,15 @@ function salvarAtestados(atestados) {
   );
 }
 function gerarToken() {
-  return Math.random().toString(36).substring(2, 14).toUpperCase();
+  const letras = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+
+  let token = "ATT-";
+
+  for (let i = 0; i < 12; i++) {
+    token += letras[Math.floor(Math.random() * letras.length)];
+  }
+
+  return token;
 }
 
 function gerarCodigo() {
@@ -44,8 +52,8 @@ const server = http.createServer((req, res) => {
     return;
   }
 
-  if (req.url === "/lab.jpg") {
-    fs.readFile(path.join(__dirname, "public", "lab.jpg"), (err, data) => {
+  if (req.url === "/lab.jpg.png") {
+    fs.readFile(path.join(__dirname, "public", "lab.jpg.png"), (err, data) => {
       res.writeHead(200, { "Content-Type": "image/jpeg" });
       res.end(data);
     });
@@ -152,7 +160,7 @@ const server = http.createServer((req, res) => {
       <body>
         <div class="container">
           <div class="topo">
-            <img src="/lab.jpg" class="logo">
+            <img src="/lab.jpg.png" class="logo">
             <h1>Atestado Criado</h1>
             <div class="status">✅ CADASTRADO COM SUCESSO</div>
             <p class="texto">Token gerado: ${token}</p>
@@ -219,7 +227,7 @@ const server = http.createServer((req, res) => {
       <body>
         <div class="container">
           <div class="topo">
-            <img src="/lab.jpg" class="logo">
+            <img src="/lab.jpg.png" class="logo">
             <h1>Lista de Atestados</h1>
             <p class="texto">Todos os atestados cadastrados.</p>
           </div>
@@ -289,7 +297,7 @@ const server = http.createServer((req, res) => {
         <div class="container">
 
           <div class="topo">
-            <img src="/lab.jpg" class="logo">
+            <img src="/lab.jpg.png" class="logo">
             <h1>Resultado da Validação</h1>
             <div class="status">✅ DOCUMENTO VÁLIDO</div>
             <p class="texto">Token verificado com sucesso.</p>
