@@ -7,6 +7,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const arquivoDados = path.join(__dirname, "atestados.json");
+const SITE_URL = "https://atestado-qr.onrender.com";
 
 const SENHA_ADMIN = "GS3MkTFW3A";
 let adminLogado = false;
@@ -21,14 +22,11 @@ function carregarAtestados() {
 }
 
 function salvarAtestados(atestados) {
-  fs.writeFileSync(
-    arquivoDados,
-    JSON.stringify(atestados, null, 2)
-  );
+  fs.writeFileSync(arquivoDados, JSON.stringify(atestados, null, 2));
 }
+
 function gerarToken() {
   const letras = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-
   let token = "ATT-";
 
   for (let i = 0; i < 12; i++) {
@@ -42,31 +40,39 @@ function gerarCodigo() {
   return Math.random().toString(36).substring(2, 8).toUpperCase();
 }
 
+function enviarArquivo(res, arquivo, tipo) {
+  fs.readFile(arquivo, (err, data) => {
+    if (err) {
+      res.writeHead(404);
+      res.end("Arquivo não encontrado");
+      return;
+    }
+
+    res.writeHead(200, { "Content-Type": tipo });
+    res.end(data);
+  });
+}
+
 const server = http.createServer((req, res) => {
 
-  if (req.url === "/style.css") {
-    fs.readFile(path.join(__dirname, "style.css"), (err, data) => {
-      res.writeHead(200, { "Content-Type": "text/css" });
-      res.end(data);
-    });
+  if (req.url === "/") {
+    res.writeHead(302, { Location: "/login" });
+    res.end();
     return;
   }
 
-  if (req.url === "/lab.jpg.png") {
-    fs.readFile(path.join(__dirname, "public", "lab.jpg.png"), (err, data) => {
-      res.writeHead(200, { "Content-Type": "image/jpeg" });
-      res.end(data);
-    });
+  if (req.url === "/style.css") {
+    enviarArquivo(res, path.join(__dirname, "style.css"), "text/css");
+    return;
+  }
+
+  if (req.url === "/lab.jpg.png" || req.url === "/lab.jpg") {
+    enviarArquivo(res, path.join(__dirname, "public", "lab.jpg.png"), "image/png");
     return;
   }
 
   if (req.url === "/login") {
-    fs.readFile(path.join(__dirname, "login.html"), (err, data) => {
-      res.writeHead(200, {
-        "Content-Type": "text/html; charset=utf-8"
-      });
-      res.end(data);
-    });
+    enviarArquivo(res, path.join(__dirname, "login.html"), "text/html; charset=utf-8");
     return;
   }
 
@@ -83,19 +89,12 @@ const server = http.createServer((req, res) => {
 
       if (senha === SENHA_ADMIN) {
         adminLogado = true;
-
-        res.writeHead(302, {
-          Location: "/admin"
-        });
-
+        res.writeHead(302, { Location: "/admin" });
         res.end();
         return;
       }
 
-      res.writeHead(200, {
-        "Content-Type": "text/html; charset=utf-8"
-      });
-
+      res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
       res.end(`
         <h1>Senha incorreta</h1>
         <p><a href="/login">Tentar novamente</a></p>
@@ -107,26 +106,17 @@ const server = http.createServer((req, res) => {
 
   if (req.url === "/admin") {
     if (!adminLogado) {
-      res.writeHead(302, {
-        Location: "/login"
-      });
-
+      res.writeHead(302, { Location: "/login" });
       res.end();
       return;
     }
 
-    fs.readFile(path.join(__dirname, "admin.html"), (err, data) => {
-      res.writeHead(200, {
-        "Content-Type": "text/html; charset=utf-8"
-      });
-      res.end(data);
-    });
-
+    enviarArquivo(res, path.join(__dirname, "admin.html"), "text/html; charset=utf-8");
     return;
   }
 
   if (req.url.startsWith("/criar")) {
-    const url = new URL(req.url, "https://atestado-qr.onrender.com");
+    const url = new URL(req.url, SITE_URL);
 
     const atestados = carregarAtestados();
     const token = gerarToken();
@@ -139,16 +129,16 @@ const server = http.createServer((req, res) => {
       medico: url.searchParams.get("medico"),
       crm: url.searchParams.get("crm"),
       afastamento: url.searchParams.get("afastamento"),
-      emitido: new Date().toLocaleString("pt-BR"),
+      emitido: url.searchParams.get("emitido"),
       codigo: gerarCodigo()
     };
 
     atestados.push(novoAtestado);
     salvarAtestados(atestados);
-        res.writeHead(200, {
-      "Content-Type": "text/html; charset=utf-8"
-    });
 
+    const link = `${SITE_URL}/validar?token=${token}`;
+
+    res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
     res.end(`
       <!DOCTYPE html>
       <html lang="pt-BR">
@@ -168,11 +158,11 @@ const server = http.createServer((req, res) => {
 
           <div class="card dados">
             <h2>Link de validação</h2>
-            <p>https://atestado-qr.onrender.com/validar?token=${token}</p>
+            <p>${link}</p>
 
             <h2>QR Code</h2>
             <img 
-              src="https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=https://atestado-qr.onrender.com/validar?token=${token}" 
+              src="https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(link)}" 
               width="220"
             >
           </div>
@@ -185,6 +175,12 @@ const server = http.createServer((req, res) => {
   }
 
   if (req.url === "/lista") {
+    if (!adminLogado) {
+      res.writeHead(302, { Location: "/login" });
+      res.end();
+      return;
+    }
+
     const atestados = carregarAtestados();
 
     let itens = "";
@@ -212,9 +208,7 @@ const server = http.createServer((req, res) => {
       `;
     });
 
-    res.writeHead(200, {
-      "Content-Type": "text/html; charset=utf-8"
-    });
+    res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
 
     res.end(`
       <!DOCTYPE html>
@@ -242,39 +236,35 @@ const server = http.createServer((req, res) => {
   }
 
   if (req.url.startsWith("/excluir")) {
-    const url = new URL(req.url, "https://atestado-qr.onrender.com");
+    if (!adminLogado) {
+      res.writeHead(302, { Location: "/login" });
+      res.end();
+      return;
+    }
+
+    const url = new URL(req.url, SITE_URL);
     const token = url.searchParams.get("token");
 
     let atestados = carregarAtestados();
 
-    atestados = atestados.filter(
-      item => item.token !== token
-    );
+    atestados = atestados.filter(item => item.token !== token);
 
     salvarAtestados(atestados);
 
-    res.writeHead(302, {
-      Location: "/lista"
-    });
-
+    res.writeHead(302, { Location: "/lista" });
     res.end();
-
     return;
   }
 
   if (req.url.startsWith("/validar")) {
-    const url = new URL(req.url, "https://atestado-qr.onrender.com");
+    const url = new URL(req.url, SITE_URL);
     const token = url.searchParams.get("token");
 
     const atestados = carregarAtestados();
 
-    const atestado = atestados.find(
-      item => item.token === token
-    );
+    const atestado = atestados.find(item => item.token === token);
 
-    res.writeHead(200, {
-      "Content-Type": "text/html; charset=utf-8"
-    });
+    res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
 
     if (!atestado) {
       res.end(`
@@ -333,16 +323,8 @@ const server = http.createServer((req, res) => {
     return;
   }
 
-  fs.readFile(
-    path.join(__dirname, "index.html"),
-    (err, data) => {
-      res.writeHead(200, {
-        "Content-Type": "text/html; charset=utf-8"
-      });
-
-      res.end(data);
-    }
-  );
+  res.writeHead(404, { "Content-Type": "text/html; charset=utf-8" });
+  res.end("<h1>Página não encontrada</h1>");
 
 });
 

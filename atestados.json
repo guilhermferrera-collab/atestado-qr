@@ -31,5 +31,38 @@
     "afastamento": "3",
     "emitido": "07/06/2026, 10:09:42",
     "codigo": "MGMI8R"
+  },
+  {
+    "token": "ATT-BGW0QLR5XS7F",
+    "nome": "JOHNATA S. DE OLIVEIRA",
+    "cpf": "364.853.918-35",
+    "nascimento": "28.02.1990",
+    "medico": "Dra. Flávia Nunes Maruyama",
+    "crm": "216997",
+    "afastamento": "12 Dias",
+    "emitido": "17/06/2026, 22:11:08",
+    "codigo": "K803KC"
+  },
+  {
+    "token": "ATT-8HOVMJGQK4NV",
+    "nome": "JOHNATA S. DE OLIVEIRA",
+    "cpf": "364.853.918-35",
+    "nascimento": "28.02.1990",
+    "medico": "Dra. Flávia Nunes Maruyama",
+    "crm": "216997",
+    "afastamento": "12 Dias",
+    "emitido": "17/06/2026, 22:15:07",
+    "codigo": "0BODIT"
+  },
+  {
+    "token": "ATT-VTAYDB4TISNK",
+    "nome": "JOHNATA S. DE OLIVEIRA",
+    "cpf": "364.853.918-35",
+    "nascimento": "28.02.1990",
+    "medico": "Dra. Flávia Nunes Maruyama",
+    "crm": "216997",
+    "afastamento": "12 Dias",
+    "emitido": "17/06/2026, 22:15:11",
+    "codigo": "VJHBCU"
   }
 ]
